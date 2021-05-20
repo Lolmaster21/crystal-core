@@ -1,0 +1,112 @@
+import pygame
+pygame.init()  # initalizes Pygame
+pygame.display.set_caption("Crytal Core")  # sets the window title
+screen = pygame.display.set_mode((500, 500))  # creates game screen 
+background2 = pygame.image.load('background2.png')
+clock = pygame.time.Clock()# start game clock
+#Resize part
+background2 = pygame.transform.scale(background2,(500,500))
+#game varialbles---------------------------------------------
+doExit = False #this variable controls our game loop
+playerX = 20 #player x position
+playerY = 400 #player y position
+isOnGround = False 
+Vx = 0 #player left/right speed
+Vy = 0 #player up/down speed
+xDir = 1
+yDir = 1
+#a 2D array (aka matrix) used to hold our "level"
+grid=[ [0,0,0,0,0,0,0,0,0,0],
+       [0,0,0,0,0,0,0,0,0,0],
+       [0,0,0,0,0,0,0,0,0,0],
+       [0,0,0,0,0,1,0,0,0,0],
+       [0,0,1,0,0,0,0,0,0,0],
+       [0,0,0,0,0,0,0,0,0,0],
+       [0,0,0,0,1,0,0,0,0,0],
+       [0,0,0,0,0,0,0,1,0,0],
+       [0,0,0,0,0,0,0,0,0,1],
+       [1,1,1,1,1,1,1,1,1,1]]
+
+
+
+#game loop#######################################
+while not doExit:
+    clock.tick(60)
+#physics section-----------------------------
+    #lets you quit the game from the gamescreen
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            doExit = True
+   
+    # input/output section
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        Vx = -2
+    if keys[pygame.K_RIGHT]:
+        Vx = 2
+    if keys[pygame.K_SPACE] or keys[pygame.K_UP]:
+        if isOnGround == True: #comment this to ensable double jumping
+            Vy = -5
+    playerX += Vx
+    playerY += Vy
+    
+
+    #stop the player from falling off the bottom of the screen
+    if playerY > 500 - 20: #check if your feet are on the ground
+        isOnGround = True
+        playerY = 500 - 20
+        Vx = 0 #stot falling if on ground
+    else:
+        isOnGround = False
+
+    #GRAVITY    
+    if isOnGround == False:
+        Vy+=.1 #if not on ground, fall downwards
+
+    #try adding fricition
+    friction=0,  # friction in pixels per second (for both x and y directions)
+     
+    #collision with blue trampolines     
+    #if playerX+20 > 100 and playerY+20 >400 and playerX +20<200:
+      #Vy = -10 
+    #if playerX+20 > 100 and playerY+20 >400 and playerX +20<300:
+      #Vy = -10
+    #if playerX+20 > 100 and playerY+20 >400 and playerX +20<400:
+     # Vy = -10   
+
+
+#feets collision
+    if grid[int((playerY+20)/50)][int((playerX)/50)] == 1 and yDir ==1:
+      Vy = 0 
+      Vx = 0
+      isOnGround = True
+    else: 
+      isOnGround = False
+#try adding left/right collision
+    if grid[int((playerY+20)/50)][int((playerX)/50)] == 1 and yDir ==1:
+      Vy = 0 
+      Vx = 0
+      isOnGround = True
+    else: 
+      isOnGround = False
+   
+#render section-------------------------------
+    
+    screen.blit(background2,(0,0)) #clear screen between loops
+    pygame.draw.rect(screen, (255, 50, 50), (playerX, playerY, 20, 20)) #draw player
+    #pygame.draw.rect(screen, (83, 220, 230), (0, 400, 80, 20)) #trampoline
+    #pygame.draw.rect(screen, (83, 220, 230), (100, 400, 80, 20)) #trampoline
+    #pygame.draw.rect(screen, (83, 220, 230), (200, 400, 80, 20)) #trampoline2
+    #pygame.draw.rect(screen, (83, 220, 230), (300, 400, 80, 20)) #trampoline
+    
+    for i in range(0,10,1): 
+        for j in range (0,10,1):
+            if grid[i][j]==1:
+                pygame.draw.rect(screen, (0,0,0), (j*50, i*50, 50, 30))
+            
+
+    pygame.display.flip() #draws all the stuff above the screen    
+    
+#####################################end game loop
+pygame.quit()
+
